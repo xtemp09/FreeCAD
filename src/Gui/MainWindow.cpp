@@ -524,6 +524,8 @@ MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags f)
 
 MainWindow::~MainWindow()
 {
+    disconnect(d->mdiArea, &QMdiArea::subWindowActivated,
+               this, &MainWindow::onWindowActivated);
     delete d->status;
     delete d;
     instance = nullptr;
