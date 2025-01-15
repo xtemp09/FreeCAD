@@ -604,12 +604,15 @@ void StdWorkbench::setupContextMenu(const char* recipient, MenuItem* item) const
     else if (strcmp(recipient,"Tree") == 0)
     {
         if (Gui::Selection().countObjectsOfType(App::DocumentObject::getClassTypeId()) > 0) {
+            auto clipboard_cmds = new MenuItem();
+            clipboard_cmds->setHorizontal(true);
+            *clipboard_cmds << "Std_Cut" << "Std_Copy" << "Std_Paste" << "Std_Delete" << "Std_SendToPythonConsole";
+
             *item  << "Std_ToggleFreeze" << "Separator"
                   << "Std_Placement" << "Std_ToggleVisibility" << "Std_ShowSelection" << "Std_HideSelection"
                   << "Std_ToggleSelectability" << "Std_TreeSelectAllInstances" << "Separator"
                   << "Std_RandomColor" << "Std_ToggleTransparency" << "Separator"
-                  << "Std_Cut" << "Std_Copy" << "Std_Paste" << "Std_Delete"
-                  << "Std_SendToPythonConsole" << "Separator";
+                  << clipboard_cmds << "Separator";
         }
     }
 }

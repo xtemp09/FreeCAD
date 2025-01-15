@@ -25,6 +25,9 @@
 # include <QApplication>
 # include <QMenu>
 # include <QMenuBar>
+# include <QToolButton>
+# include <QHBoxLayout>
+# include <QWidgetAction>
 #endif
 
 #include "MenuManager.h"
@@ -114,6 +117,16 @@ MenuItem* MenuItem::copy() const
 uint MenuItem::count() const
 {
     return _items.count();
+}
+
+bool MenuItem::isHorizontal()
+{
+    return horizontal;
+}
+
+void MenuItem::setHorizontal(bool orientation)
+{
+    horizontal = orientation;
 }
 
 void MenuItem::appendItem(MenuItem* item)
@@ -294,6 +307,35 @@ void MenuManager::setup(MenuItem* menuItems) const
     //menuBar->setUpdatesEnabled(true);
 }
 
+inline
+QWidget *makeHorizontalWidget(MenuItem *item)
+{
+    auto getQAction = [&mgr = Application::Instance->commandManager()](MenuItem *it){
+        QAction *result = nullptr;
+        if (QWidget tmp_w; mgr.addTo(it->command().c_str(), &tmp_w))
+        if (QList <QAction *> tmp_act_lst = tmp_w.actions(); !tmp_act_lst.isEmpty())
+            result = tmp_act_lst.front();
+        return result; };
+
+    auto makeQToolButton = [](QAction *act){
+        auto tb = new QToolButton ();
+        tb->setDefaultAction(act);
+        tb->setAutoRaise(true);
+        return tb; };
+
+    auto lay = new QHBoxLayout();
+    const QList <MenuItem *> list_of_horizontal_items = item->getItems();
+    for (auto menu_item : list_of_horizontal_items)
+        if (auto act = getQAction(menu_item); act != nullptr)
+            lay->addWidget(makeQToolButton(act));
+    lay->addStretch(1);
+
+    auto horizontal_widget = new QWidget();
+    horizontal_widget->setLayout(lay);
+
+    return horizontal_widget;
+}
+
 void MenuManager::setup(MenuItem* item, QMenu* menu) const
 {
     CommandManager& mgr = Application::Instance->commandManager();
@@ -310,6 +352,7 @@ void MenuManager::setup(MenuItem* item, QMenu* menu) const
             }
             else {
                 if (item->hasItems()) {
+                    if (item->isHorizontal() == false) {
                     // Creste a submenu
                     std::string menuName = item->command();
                     QMenu* submenu = menu->addMenu(QApplication::translate("Workbench", menuName.c_str()));
@@ -319,8 +362,13 @@ void MenuManager::setup(MenuItem* item, QMenu* menu) const
                     // set the menu user data
                     action->setData(QString::fromLatin1(item->command().c_str()));
                     used_actions.append(action);
-                }
-                else {
+                    } else { // creates a horizontal widget
+                        auto w_a = new QWidgetAction(menu);
+                        w_a->setDefaultWidget(makeHorizontalWidget(item));
+                        menu->addAction(w_a);
+                        used_actions.append(w_a);
+                    } //end of horizontal widget
+                } else {
                     // A command can have more than one QAction
                     int count = menu->actions().count();
                     // Check if action was added successfully
@@ -347,7 +395,7 @@ void MenuManager::setup(MenuItem* item, QMenu* menu) const
         }
 
         // fill up the submenu
-        if (item->hasItems()) {
+        if (item->hasItems() && item->isHorizontal() == false) {
             setup(item, used_actions.front()->menu());
         }
     }
