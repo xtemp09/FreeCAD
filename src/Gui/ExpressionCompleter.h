@@ -100,8 +100,9 @@ public Q_SLOTS:
 protected:
     void keyPressEvent(QKeyEvent * event) override;
     void contextMenuEvent(QContextMenuEvent * event) override;
+
+    ExpressionCompleter *completer;
 private:
-    ExpressionCompleter * completer;
     bool block;
     bool noProperty;
     bool exactMatch;

@@ -56,6 +56,7 @@ public:
 Q_SIGNALS:
     void zoomLevelChanged(int);  /// This signal is emitted whenever zoom level is changed. It is
                                  /// used to show the zoom level in the zoom button.
+    void scrollingOccured();
 
 public Q_SLOTS:
     void zoomIn(void);  /// This function is the slot for the zoomIn button and a keyboard shortcut

@@ -88,6 +88,9 @@ ZoomableView::ZoomableView(Ui::Sheet* ui)
     connect(dummySB_h, &QAbstractSlider::valueChanged, this, &ZoomableView::updateView);
     connect(dummySB_v, &QAbstractSlider::valueChanged, this, &ZoomableView::updateView);
 
+    connect(realSB_h, &QAbstractSlider::valueChanged, this, &ZoomableView::scrollingOccured);
+    connect(realSB_v, &QAbstractSlider::valueChanged, this, &ZoomableView::scrollingOccured);
+
     connect(this,
             &ZoomableView::zoomLevelChanged,
             ui->zoomTB,
