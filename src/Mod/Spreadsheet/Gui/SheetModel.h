@@ -65,6 +65,8 @@ private:
     QColor textFgColor;
     QColor positiveFgColor;
     QColor negativeFgColor;
+
+    QVariantList columnLabels, rowLabels;
 };
 
 }  // namespace SpreadsheetGui
